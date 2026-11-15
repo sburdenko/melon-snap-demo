@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#14090c">
+    <title>Melon Snap - Demo</title>
+    <style>
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: radial-gradient(circle at 50% 30%, #3a1420 0%, #14090c 70%);
+        overflow: hidden;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        color: #ffe9c7;
+      }
+
+      #stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #unity-canvas {
+        height: min(100dvh, calc(100vw * 16 / 9));
+        aspect-ratio: 9 / 16;
+        display: block;
+        background: #14090c;
+        box-shadow: 0 0 60px rgba(255, 90, 110, 0.25);
+        touch-action: none;
+      }
+
+      #loader {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        pointer-events: none;
+      }
+
+      #loader-title {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: #ff5c78;
+        text-shadow: 0 2px 0 #3d0a14;
+      }
+
+      #loader-track {
+        width: 220px;
+        height: 12px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.12);
+        overflow: hidden;
+      }
+
+      #loader-fill {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #4fd36b, #b9f25a);
+        transition: width 0.15s;
+      }
+
+      #error {
+        display: none;
+        position: absolute;
+        bottom: 24px;
+        left: 16px;
+        right: 16px;
+        text-align: center;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <canvas id="unity-canvas" tabindex="-1"></canvas>
+    </div>
+    <div id="loader">
+      <div id="loader-title">Melon Snap</div>
+      <div id="loader-track"><div id="loader-fill"></div></div>
+    </div>
+    <div id="error"></div>
+    <script src="Build/WebGL.loader.js"></script>
+    <script>
+      var config = {
+        arguments: [],
+        dataUrl: "Build/WebGL.data.unityweb",
+        frameworkUrl: "Build/WebGL.framework.js.unityweb",
+        codeUrl: "Build/WebGL.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "Melon Snap",
+        productVersion: "0.1",
+      };
+
+      // Phones render at native density and burn the GPU; cap it so the demo stays smooth.
+      config.devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+      var loader = document.getElementById("loader");
+      var fill = document.getElementById("loader-fill");
+      var errorBox = document.getElementById("error");
+
+      createUnityInstance(document.getElementById("unity-canvas"), config, function (progress) {
+        fill.style.width = Math.round(progress * 100) + "%";
+      }).then(function () {
+        loader.style.display = "none";
+      }).catch(function (message) {
+        errorBox.style.display = "block";
+        errorBox.textContent = "Could not start the game: " + message;
+      });
+    </script>
+  </body>
+</html>
